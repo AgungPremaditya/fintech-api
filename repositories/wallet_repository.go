@@ -23,3 +23,14 @@ func GetWallets() ([]models.Wallet, error) {
 
 	return wallets, nil
 }
+
+func GetWallet(id string) (models.Wallet, error) {
+	var wallet models.Wallet
+	result := connection.First(&wallet, "id = ?", id)
+
+	if result.Error != nil {
+		return models.Wallet{}, fmt.Errorf("failed to fetch wallet: %v", result.Error)
+	}
+
+	return wallet, nil
+}

@@ -17,3 +17,15 @@ func GetWalletsService() ([]models.Wallet, error) {
 
 	return wallets, nil
 }
+
+func GetWalletService(id string) (models.Wallet, error) {
+	var wallet models.Wallet
+
+	wallet, err := repositories.GetWallet(id)
+	if err != nil {
+		log.Println("Error getting wallet:", err)
+		return models.Wallet{}, err
+	}
+
+	return wallet, nil
+}

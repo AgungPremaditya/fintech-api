@@ -14,6 +14,7 @@ func SetupRoutes() *mux.Router {
 
 	// Wallet routes
 	router.HandleFunc("/wallets", controllers.GetWallets).Methods("GET")
+	router.HandleFunc("/wallets/{id}", controllers.GetWallet).Methods("GET")
 
 	return router
 }
