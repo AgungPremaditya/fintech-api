@@ -22,5 +22,6 @@ func SetupRoutes(c *Controllers) *mux.Router {
 
 func WalletRoutes(router *mux.Router, c *controllers.WalletController) {
 	router.HandleFunc("", c.GetWallets).Methods("GET")
+	router.HandleFunc("", c.CreateWallet).Methods("POST")
 	router.HandleFunc("/{id}", c.GetWallet).Methods("GET")
 }

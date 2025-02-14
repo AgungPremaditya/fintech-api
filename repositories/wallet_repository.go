@@ -36,3 +36,10 @@ func (r *WalletRepository) GetWallet(id string) (models.Wallet, error) {
 
 	return wallet, nil
 }
+
+func (r *WalletRepository) CreateWallet(wallet *models.Wallet) (*models.Wallet, error) {
+	if err := r.db.Create(wallet).Error; err != nil {
+		return nil, err
+	}
+	return wallet, nil
+}

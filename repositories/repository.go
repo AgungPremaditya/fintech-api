@@ -4,10 +4,12 @@ import "gorm.io/gorm"
 
 type Repositories struct {
 	WalletRepository *WalletRepository
+	UserRepository   *UserRepository
 }
 
 func NewRepositories(db *gorm.DB) *Repositories {
 	return &Repositories{
 		WalletRepository: NewWalletRepository(db),
+		UserRepository:   NewUserRepository(db),
 	}
 }
