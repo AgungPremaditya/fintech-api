@@ -2,18 +2,16 @@ package db
 
 import (
 	"fmt"
+	"ledger-system/config"
 	"log"
-	"os"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func Init() *gorm.DB {
-	dbURL := os.Getenv("DATABASE_URL")
-	if dbURL == "" {
-		dbURL = "postgres://postgres:postgres@localhost:5432/ledger_system?sslmode=disable"
-	}
+	dbConfig := config.LoadConfig()
+	dbURL := dbConfig.GetDSN()
 
 	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
 	if err != nil {

@@ -18,3 +18,12 @@ type Transaction struct {
 	UpdatedAt time.Time       `gorm:"autoUpdateTime"`
 	DeletedAt gorm.DeletedAt  `gorm:"index"`
 }
+
+// Transaction Type
+type TransactionType string
+
+const (
+	Deposit  TransactionType = "DEPOSIT"
+	Withdraw TransactionType = "WITHDRAW"
+	Transfer TransactionType = "TRANSFER"
+)
