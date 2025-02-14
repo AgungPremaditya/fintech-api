@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Init(args []string) *gorm.DB {
+func Init() *gorm.DB {
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
 		dbURL = "postgres://postgres:postgres@localhost:5432/ledger_system?sslmode=disable"
@@ -21,9 +21,6 @@ func Init(args []string) *gorm.DB {
 	}
 
 	fmt.Println("Database connected successfully")
-
-	// Add run commands
-	RunCommands(db, os.Args[1:])
 
 	return db
 }

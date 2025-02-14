@@ -1,10 +1,14 @@
 package main
 
 import (
-	"ledger-system/db"
-	"os"
+	"ledger-system/repositories"
+	"ledger-system/routes"
+	"log"
+	"net/http"
 )
 
 func main() {
-	db.Init(os.Args[1:])
+	repositories.Init()
+	router := routes.SetupRoutes()
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
