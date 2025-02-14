@@ -6,15 +6,21 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func SetupRoutes() *mux.Router {
+type Controllers struct {
+	WalletController *controllers.WalletController
+}
+
+func SetupRoutes(c *Controllers) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 
-	// Health check route
-	router.HandleFunc("/", controllers.GetApiHealth).Methods("GET")
-
 	// Wallet routes
-	router.HandleFunc("/wallets", controllers.GetWallets).Methods("GET")
-	router.HandleFunc("/wallets/{id}", controllers.GetWallet).Methods("GET")
+	walletRouter := router.PathPrefix("/wallets").Subrouter()
+	WalletRoutes(walletRouter, c.WalletController)
 
 	return router
+}
+
+func WalletRoutes(router *mux.Router, c *controllers.WalletController) {
+	router.HandleFunc("", c.GetWallets).Methods("GET")
+	router.HandleFunc("/{id}", c.GetWallet).Methods("GET")
 }

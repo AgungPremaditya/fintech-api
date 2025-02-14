@@ -8,10 +8,20 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func GetWallets(w http.ResponseWriter, r *http.Request) {
+type WalletController struct {
+	walletService *services.WalletService
+}
+
+func NewWalletController(service *services.WalletService) *WalletController {
+	return &WalletController{
+		walletService: service,
+	}
+}
+
+func (c *WalletController) GetWallets(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	wallets, err := services.GetWalletsService()
+	wallets, err := c.walletService.GetWalletsService()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -26,11 +36,11 @@ func GetWallets(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func GetWallet(w http.ResponseWriter, r *http.Request) {
+func (c *WalletController) GetWallet(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	id := mux.Vars(r)["id"]
-	wallet, err := services.GetWalletService(id)
+	wallet, err := c.walletService.GetWalletService(id)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]interface{}{

@@ -16,5 +16,5 @@ type User struct {
 	CreatedAt time.Time      `gorm:"autoCreateTime"`
 	UpdatedAt time.Time      `gorm:"autoUpdateTime"`
 	DeletedAt gorm.DeletedAt `gorm:"index"`
-	Wallet    []Wallet       `gorm:"foreignKey:UserID"`
+	Wallets   []Wallet       `gorm:"foreignKey:UserID"`
 }

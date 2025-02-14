@@ -38,8 +38,13 @@ func RunCommands(database *gorm.DB, args []string) {
 		switch arg {
 		case "migrate":
 			Migrate(database)
+			fmt.Println("Database migrated successfully")
 		case "seed":
 			Seed(database)
+			fmt.Println("Database seeded successfully")
+		case "revert":
+			Revert(database)
+			fmt.Println("Database reverted successfully")
 		}
 	}
 }

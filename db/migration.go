@@ -17,3 +17,11 @@ func Migrate(db *gorm.DB) error {
 		&models.Transaction{},
 	)
 }
+
+func Revert(db *gorm.DB) error {
+	return db.Migrator().DropTable(
+		&models.User{},
+		&models.Wallet{},
+		&models.Transaction{},
+	)
+}

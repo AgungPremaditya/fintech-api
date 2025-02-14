@@ -2,20 +2,22 @@ package repositories
 
 import (
 	"fmt"
-	"ledger-system/db"
 	"ledger-system/models"
 
 	"gorm.io/gorm"
 )
 
-var connection *gorm.DB
-
-func Init() {
-	connection = db.Init()
+type WalletRepository struct {
+	db *gorm.DB
 }
-func GetWallets() ([]models.Wallet, error) {
+
+func NewWalletRepository(db *gorm.DB) *WalletRepository {
+	return &WalletRepository{db: db}
+}
+
+func (r *WalletRepository) GetWallets() ([]models.Wallet, error) {
 	var wallets []models.Wallet
-	result := connection.Find(&wallets)
+	result := r.db.Preload("User").Find(&wallets)
 
 	if result.Error != nil {
 		return nil, fmt.Errorf("failed to fetch wallets: %v", result.Error)
@@ -24,9 +26,9 @@ func GetWallets() ([]models.Wallet, error) {
 	return wallets, nil
 }
 
-func GetWallet(id string) (models.Wallet, error) {
+func (r *WalletRepository) GetWallet(id string) (models.Wallet, error) {
 	var wallet models.Wallet
-	result := connection.First(&wallet, "id = ?", id)
+	result := r.db.Preload("User").First(&wallet, "id = ?", id)
 
 	if result.Error != nil {
 		return models.Wallet{}, fmt.Errorf("failed to fetch wallet: %v", result.Error)
