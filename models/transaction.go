@@ -3,27 +3,16 @@ package models
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
-	"gorm.io/gorm"
 )
 
 // Transaction Models
 type Transaction struct {
-	ID        uuid.UUID       `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
+	ID        int64           `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
 	Type      string          `gorm:"type:varchar(255);not null"`
 	Amount    decimal.Decimal `gorm:"type:decimal(36,18);not null"`
 	Reference string          `gorm:"type:varchar(255);not null"`
 	CreatedAt time.Time       `gorm:"autoCreateTime"`
-	UpdatedAt time.Time       `gorm:"autoUpdateTime"`
-	DeletedAt gorm.DeletedAt  `gorm:"index"`
-
-	// Relationships
-	FromWalletID uuid.NullUUID `gorm:"type:uuid"`
-	FromWallet   Wallet        `gorm:"foreignKey:FromWalletID"`
-
-	ToWalletID uuid.NullUUID `gorm:"type:uuid"`
-	ToWallet   Wallet        `gorm:"foreignKey:ToWalletID"`
 }
 
 // Transaction Type
