@@ -16,7 +16,7 @@ func LoadConfig() *Config {
 		Port:     getEnv("DB_PORT", "5432"),
 		User:     getEnv("DB_USER", "postgres"),
 		Password: getEnv("DB_PASSWORD", "postgres"),
-		DBName:   getEnv("DB_NAME", "ledger_system"),
+		DBName:   getEnv("DB_NAME", "fintech-api"),
 	}
 }
 

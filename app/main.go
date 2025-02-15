@@ -9,9 +9,14 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Load .env file
+	godotenv.Load()
+
 	// Initialize db
 	initDB := db.Init()
 
