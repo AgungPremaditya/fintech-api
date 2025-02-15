@@ -24,17 +24,7 @@ func (m *Mapper) ToTransactionModel(transaction *CreateTransactionDTO, wallet *m
 		Type:      string(transaction.Type),
 		Amount:    decimal.NewFromFloat(transaction.Amount),
 		Reference: transaction.Reference,
-	}
-
-	transactionType := models.TransactionType(transaction.Type)
-
-	// Check transaction type and set wallet
-	if transactionType == models.Deposit {
-		newTransaction.ToWalletID.UUID = wallet.ID
-		newTransaction.ToWallet = *wallet
-	} else if transactionType == models.Withdraw {
-		newTransaction.FromWalletID.UUID = wallet.ID
-		newTransaction.FromWallet = *wallet
+		WalletID:  wallet.ID,
 	}
 
 	return &newTransaction, nil
@@ -42,23 +32,21 @@ func (m *Mapper) ToTransactionModel(transaction *CreateTransactionDTO, wallet *m
 
 func (m *Mapper) ToTransactionDetailResponse(transaction *models.Transaction) *DetailTransactionDTO {
 	return &DetailTransactionDTO{
-		ID:         transaction.ID.String(),
-		Type:       models.TransactionType(transaction.Type),
-		Amount:     transaction.Amount,
-		Reference:  transaction.Reference,
-		FromWallet: m.walletMapper.ToWalletEmbedDTO(&transaction.FromWallet),
-		ToWallet:   m.walletMapper.ToWalletEmbedDTO(&transaction.ToWallet),
+		ID:        transaction.ID.String(),
+		Type:      models.TransactionType(transaction.Type),
+		Amount:    transaction.Amount,
+		Reference: transaction.Reference,
+		Wallet:    m.walletMapper.ToWalletEmbedDTO(&transaction.Wallet),
 	}
 }
 
 func (m *Mapper) ToTransactionResponse(transaction *models.Transaction) TransactionIndexDTO {
 	return TransactionIndexDTO{
-		ID:         transaction.ID.String(),
-		Type:       transaction.Type,
-		FromWallet: m.walletMapper.ToWalletEmbedDTO(&transaction.FromWallet),
-		ToWallet:   m.walletMapper.ToWalletEmbedDTO(&transaction.ToWallet),
-		Amount:     transaction.Amount.String(),
-		Reference:  transaction.Reference,
+		ID:        transaction.ID.String(),
+		Type:      transaction.Type,
+		Wallet:    m.walletMapper.ToWalletEmbedDTO(&transaction.Wallet),
+		Amount:    transaction.Amount.String(),
+		Reference: transaction.Reference,
 	}
 }
 
@@ -83,15 +71,8 @@ func (m *Mapper) ToTransferTransaction(transferPayload *TransferTransactionDTO, 
 		Type:      string(models.Transfer),
 		Amount:    decimal.NewFromFloat(transferPayload.Amount),
 		Reference: transferPayload.Reference,
+		Wallet:    *fromWallet,
 	}
-
-	// Set sender
-	newTransaction.FromWalletID.UUID = fromWallet.ID
-	newTransaction.FromWallet = *fromWallet
-
-	// Set receiver
-	newTransaction.ToWalletID.UUID = toWallet.ID
-	newTransaction.ToWallet = *toWallet
 
 	return &newTransaction
 }

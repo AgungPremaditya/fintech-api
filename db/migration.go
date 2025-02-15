@@ -15,6 +15,7 @@ func Migrate(db *gorm.DB) error {
 		&models.User{},
 		&models.Wallet{},
 		&models.Transaction{},
+		&models.LedgerEntry{},
 	)
 }
 
@@ -23,5 +24,6 @@ func Revert(db *gorm.DB) error {
 		&models.User{},
 		&models.Wallet{},
 		&models.Transaction{},
+		&models.LedgerEntry{},
 	)
 }

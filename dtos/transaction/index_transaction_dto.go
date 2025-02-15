@@ -6,13 +6,12 @@ import (
 )
 
 type TransactionIndexDTO struct {
-	ID         string                      `json:"id"`
-	Type       string                      `json:"type"`
-	FromWallet *wallet_dtos.EmbedWalletDTO `json:"from_wallet"`
-	ToWallet   *wallet_dtos.EmbedWalletDTO `json:"to_wallet"`
-	Amount     string                      `json:"amount"`
-	Reference  string                      `json:"reference"`
-	CreatedAt  string                      `json:"created_at"`
+	ID        string                      `json:"id"`
+	Type      string                      `json:"type"`
+	Wallet    *wallet_dtos.EmbedWalletDTO `json:"from_wallet"`
+	Amount    string                      `json:"amount"`
+	Reference string                      `json:"reference"`
+	CreatedAt string                      `json:"created_at"`
 }
 
 type TransactionPaginatedDTO struct {

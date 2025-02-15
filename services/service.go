@@ -10,6 +10,6 @@ type Service struct {
 func NewServices(repos *repositories.Repositories) *Service {
 	return &Service{
 		WalletService:      NewWalletService(repos.WalletRepository, repos.UserRepository),
-		TransactionService: NewTransactionService(repos.TransactionRepository, repos.WalletRepository),
+		TransactionService: NewTransactionService(repos.TransactionRepository, repos.WalletRepository, repos.LedgerEntryRepository),
 	}
 }

@@ -22,7 +22,7 @@ type Wallet struct {
 	UserID uuid.UUID `gorm:"type:uuid;not null"`
 	User   User      `gorm:"foreignKey:UserID"`
 
-	// Transactions relationships
-	SentTransactions     []Transaction `json:"sent_transactions" gorm:"foreignKey:FromWalletID"`
-	ReceivedTransactions []Transaction `json:"received_transactions" gorm:"foreignKey:ToWalletID"`
+	// Ledger relationships
+	LedgerEntries []LedgerEntry `gorm:"foreignKey:WalletID"`
+	Transactions  []Transaction `gorm:"foreignKey:WalletID"`
 }

@@ -2,26 +2,33 @@ package services
 
 import (
 	general_dtos "ledger-system/dtos/general"
+	ledgerentry_dtos "ledger-system/dtos/ledger_entry"
 	transaction_dtos "ledger-system/dtos/transaction"
 	"ledger-system/models"
 	"ledger-system/repositories"
 	"log"
 	"math"
+
+	"github.com/shopspring/decimal"
 )
 
 type TransactionService struct {
 	transactionRepo   *repositories.TransactionRepository
 	walletRepo        *repositories.WalletRepository
+	ledgerEntryRepo   *repositories.LedgerEntryRepository
 	transactionMapper transaction_dtos.Mapper
+	ledgerEntryMapper ledgerentry_dtos.Mapper
 }
 
 func NewTransactionService(
 	repo *repositories.TransactionRepository,
 	walletRepo *repositories.WalletRepository,
+	ledgerEntryRepo *repositories.LedgerEntryRepository,
 ) *TransactionService {
 	return &TransactionService{
 		transactionRepo: repo,
 		walletRepo:      walletRepo,
+		ledgerEntryRepo: ledgerEntryRepo,
 	}
 }
 
@@ -86,7 +93,7 @@ func (s *TransactionService) GetTransactionHistory(walletID string, pagination g
 	return s.transactionMapper.ToTransactionPaginatedResponse(&data, &meta), nil
 }
 
-func (s *TransactionService) TransferTransactionService(transaction transaction_dtos.TransferTransactionDTO) (*transaction_dtos.DetailTransactionDTO, error) {
+func (s *TransactionService) TransferTransactionService(transaction transaction_dtos.TransferTransactionDTO) (*ledgerentry_dtos.DetailTransferTransactionDTO, error) {
 	// Get sender wallet
 	fromWallet, err := s.walletRepo.GetWallet(transaction.FromWalletID)
 	if err != nil {
@@ -101,16 +108,30 @@ func (s *TransactionService) TransferTransactionService(transaction transaction_
 		return nil, err
 	}
 
-	// Map DTO to transaction models
-	newTransaction := s.transactionMapper.ToTransferTransaction(&transaction, &fromWallet, &toWallet)
+	// Set debit ledger entry
+	debitEntry := &models.LedgerEntry{
+		Type:     string(models.Debit),
+		Amount:   decimal.NewFromFloat(transaction.Amount),
+		Balance:  fromWallet.Balance.Sub(decimal.NewFromFloat(transaction.Amount)),
+		WalletID: fromWallet.ID,
+	}
 
-	createdTransaction, err := s.transactionRepo.CreateTransaction(newTransaction)
+	// Set credit ledger entry
+	creditEntry := &models.LedgerEntry{
+		Type:     string(models.Credit),
+		Amount:   decimal.NewFromFloat(transaction.Amount),
+		Balance:  toWallet.Balance.Add(decimal.NewFromFloat(transaction.Amount)),
+		WalletID: toWallet.ID,
+	}
+
+	// Process ledger entry
+	_, _, err = s.ledgerEntryRepo.ProcessLedgerEntry(debitEntry, creditEntry)
 	if err != nil {
-		log.Println("Error creating transaction:", err)
+		log.Println("Error processing ledger entry:", err)
 		return nil, err
 	}
 
-	result := s.transactionMapper.ToTransactionDetailResponse(createdTransaction)
+	result := s.ledgerEntryMapper.ToTransactionTransferDetailResponse(debitEntry, creditEntry)
 
 	return result, nil
 }
