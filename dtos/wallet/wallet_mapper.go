@@ -5,7 +5,6 @@ import (
 	"ledger-system/models"
 
 	"github.com/google/uuid"
-	"github.com/shopspring/decimal"
 )
 
 type Mapper struct {
@@ -44,7 +43,7 @@ func (m *Mapper) ToWalletModel(dto *CreateWalletDTO, user *models.User) (*models
 	}, nil
 }
 
-func (m *Mapper) ToWalletDetailResponse(wallet models.Wallet, balance *decimal.Decimal) WalletDetailDTO {
+func (m *Mapper) ToWalletDetailResponse(wallet models.Wallet) WalletDetailDTO {
 	// Map user data
 	userEmbed := m.userMapper.ToUserEmbedDTO(wallet.User)
 
@@ -53,7 +52,7 @@ func (m *Mapper) ToWalletDetailResponse(wallet models.Wallet, balance *decimal.D
 		Name:      wallet.Name,
 		Address:   wallet.Address,
 		User:      userEmbed,
-		Balance:   *balance,
+		Balance:   wallet.Balance,
 		CreatedAt: wallet.CreatedAt.String(),
 		UpdatedAt: wallet.UpdatedAt.String(),
 	}

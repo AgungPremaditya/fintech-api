@@ -16,20 +16,52 @@ func NewTransactionRepository(db *gorm.DB) *TransactionRepository {
 }
 
 func (r *TransactionRepository) CreateTransaction(transaction *models.Transaction) (*models.Transaction, error) {
-	if err := r.db.Create(transaction).Error; err != nil {
-		return nil, err
-	}
-	return transaction, nil
+	return transaction, r.db.Transaction(func(tx *gorm.DB) error {
+		// Update wallet balance
+		var wallet models.Wallet
+		if err := tx.First(&wallet, "id = ?", transaction.WalletID).Error; err != nil {
+			return err
+		}
+
+		if transaction.Type == string(models.Withdraw) {
+			wallet.Balance = wallet.Balance.Sub(transaction.Amount)
+		} else {
+			wallet.Balance = wallet.Balance.Add(transaction.Amount)
+		}
+
+		if err := tx.Save(&wallet).Error; err != nil {
+			return err
+		}
+
+		// Create ledger entry
+		if err := tx.Create(&models.LedgerEntry{
+			WalletID: transaction.WalletID,
+			Amount:   transaction.Amount,
+			Type:     string(transaction.EntryType),
+			Balance:  wallet.Balance,
+		}).Error; err != nil {
+			return err
+		}
+
+		// Create transaction
+		if err := tx.Create(&transaction).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func (r *TransactionRepository) GetTransactionsByWalletId(walletId string, pagination general_dtos.PaginationRequest) ([]models.Transaction, error) {
 	var transactions []models.Transaction
 
-	query := r.db.Preload("FromWallet").Preload("ToWallet").Where("from_wallet_id = ? OR to_wallet_id = ?", walletId, walletId)
+	query := r.db.Preload("Wallet").Where("wallet_id = ?", walletId)
 
 	if pagination.Search != "" {
 		query = query.Where("reference LIKE ?", "%"+pagination.Search+"%")
 	}
+
+	query = query.Order("created_at DESC")
 
 	offset := (pagination.Page - 1) * pagination.PerPage
 	result := query.Offset(offset).Limit(pagination.PerPage).Find(&transactions)
@@ -41,7 +73,7 @@ func (r *TransactionRepository) GetTransactionsByWalletId(walletId string, pagin
 	return transactions, nil
 }
 
-func (r *TransactionRepository) GetTransaction(walletId string) (*int64, error) {
+func (r *TransactionRepository) CountTransaction(walletId string) (*int64, error) {
 	var totalCount int64
 	r.db.Model(&models.Transaction{}).
 		Where("from_wallet_id = ? OR to_wallet_id = ?", walletId, walletId).

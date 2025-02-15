@@ -14,7 +14,15 @@ func NewLedgerEntryRepository(db *gorm.DB) *LedgerEntryRepository {
 	return &LedgerEntryRepository{db: db}
 }
 
-func (r *LedgerEntryRepository) ProcessLedgerEntry(debitEntry *models.LedgerEntry, creditEntry *models.LedgerEntry) (*models.LedgerEntry, *models.LedgerEntry, error) {
+func (r *LedgerEntryRepository) CreateLedgerEntry(ledgerEntry *models.LedgerEntry) (*models.LedgerEntry, error) {
+	if err := r.db.Create(ledgerEntry).Error; err != nil {
+		return nil, err
+	}
+
+	return ledgerEntry, nil
+}
+
+func (r *LedgerEntryRepository) ProcessTransferLedgerEntry(debitEntry *models.LedgerEntry, creditEntry *models.LedgerEntry) (*models.LedgerEntry, *models.LedgerEntry, error) {
 	// Transaction
 	return debitEntry, creditEntry, r.db.Transaction(func(tx *gorm.DB) error {
 		// Create ledger entry debit
@@ -52,6 +60,7 @@ func (r *LedgerEntryRepository) ProcessLedgerEntry(debitEntry *models.LedgerEntr
 		// Create debit transaction
 		debitTransaction := models.Transaction{
 			Type:      string(models.Transfer),
+			EntryType: string(models.Debit),
 			Amount:    debitEntry.Amount,
 			Reference: "Transfer to " + creditWallet.Address,
 			WalletID:  debitEntry.WalletID,
@@ -63,6 +72,7 @@ func (r *LedgerEntryRepository) ProcessLedgerEntry(debitEntry *models.LedgerEntr
 		// Create credit transaction
 		creditTransaction := models.Transaction{
 			Type:      string(models.Transfer),
+			EntryType: string(models.Credit),
 			Amount:    creditEntry.Amount,
 			Reference: "Transfer from " + debitWallet.Address,
 			WalletID:  creditEntry.WalletID,

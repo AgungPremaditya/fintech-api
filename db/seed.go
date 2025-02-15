@@ -4,6 +4,7 @@ import (
 	"ledger-system/models"
 	"strconv"
 
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 )
 
@@ -59,6 +60,7 @@ func seedWallets(db *gorm.DB) error {
 			User:    user,
 			Name:    "Wallet ETH " + user.Name,
 			Address: "0x113F05B1123D71d591010282eEA07f34574c811" + strconv.Itoa(i),
+			Balance: decimal.NewFromInt(10),
 		}
 		result := db.Create(&wallet)
 		if result.Error != nil {

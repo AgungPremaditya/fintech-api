@@ -77,7 +77,7 @@ func (s *TransactionService) GetTransactionHistory(walletID string, pagination g
 	data := s.transactionMapper.ToTransactionListResponse(transactions)
 
 	// Set Meta
-	totalCount, err := s.transactionRepo.GetTransaction(walletID)
+	totalCount, err := s.transactionRepo.CountTransaction(walletID)
 	if err != nil {
 		log.Println("Error getting total count:", err)
 		return nil, err
@@ -125,7 +125,7 @@ func (s *TransactionService) TransferTransactionService(transaction transaction_
 	}
 
 	// Process ledger entry
-	_, _, err = s.ledgerEntryRepo.ProcessLedgerEntry(debitEntry, creditEntry)
+	_, _, err = s.ledgerEntryRepo.ProcessTransferLedgerEntry(debitEntry, creditEntry)
 	if err != nil {
 		log.Println("Error processing ledger entry:", err)
 		return nil, err

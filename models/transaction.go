@@ -11,6 +11,7 @@ import (
 type Transaction struct {
 	ID        uuid.UUID       `gorm:"type:uuid;default:uuid_generate_v4();primary_key"`
 	Type      string          `gorm:"type:varchar(255);not null"`
+	EntryType string          `gorm:"type:varchar(255);not null"`
 	Amount    decimal.Decimal `gorm:"type:decimal(36,18);not null"`
 	Reference string          `gorm:"type:varchar(255);not null"`
 	CreatedAt time.Time       `gorm:"autoCreateTime"`

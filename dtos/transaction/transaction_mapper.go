@@ -27,6 +27,12 @@ func (m *Mapper) ToTransactionModel(transaction *CreateTransactionDTO, wallet *m
 		WalletID:  wallet.ID,
 	}
 
+	if transaction.Type == string(models.Withdraw) {
+		newTransaction.EntryType = string(models.Debit)
+	} else {
+		newTransaction.EntryType = string(models.Credit)
+	}
+
 	return &newTransaction, nil
 }
 
@@ -44,9 +50,11 @@ func (m *Mapper) ToTransactionResponse(transaction *models.Transaction) Transact
 	return TransactionIndexDTO{
 		ID:        transaction.ID.String(),
 		Type:      transaction.Type,
+		EntryType: transaction.EntryType,
 		Wallet:    m.walletMapper.ToWalletEmbedDTO(&transaction.Wallet),
 		Amount:    transaction.Amount.String(),
 		Reference: transaction.Reference,
+		CreatedAt: transaction.CreatedAt.Format("2006-01-02 15:04:05"),
 	}
 }
 

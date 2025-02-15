@@ -5,8 +5,6 @@ import (
 	"ledger-system/models"
 	"ledger-system/repositories"
 	"log"
-
-	"github.com/shopspring/decimal"
 )
 
 type WalletService struct {
@@ -47,13 +45,7 @@ func (s *WalletService) GetWalletService(id string) (wallet_dtos.WalletDetailDTO
 		return wallet_dtos.WalletDetailDTO{}, err
 	}
 
-	balance, err := s.walletRepo.GetWalletBalance(id)
-	if err != nil {
-		log.Println("Error getting wallet balance:", err)
-		return wallet_dtos.WalletDetailDTO{}, err
-	}
-
-	result := s.mapper.ToWalletDetailResponse(wallet, &balance)
+	result := s.mapper.ToWalletDetailResponse(wallet)
 
 	return result, nil
 }
@@ -78,7 +70,7 @@ func (s *WalletService) CreateWalletService(wallet wallet_dtos.CreateWalletDTO) 
 		return nil, err
 	}
 
-	result := s.mapper.ToWalletDetailResponse(*newWallet, &decimal.Zero)
+	result := s.mapper.ToWalletDetailResponse(*newWallet)
 
 	return &result, nil
 }
