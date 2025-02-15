@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -19,11 +20,11 @@ type Transaction struct {
 	DeletedAt gorm.DeletedAt  `gorm:"index"`
 
 	// Relationships
-	FromWalletID uuid.UUID `gorm:"type:uuid;not null"`
-	FromWallet   Wallet    `gorm:"foreignKey:FromWalletID"`
+	FromWalletID uuid.NullUUID `gorm:"type:uuid"`
+	FromWallet   Wallet        `gorm:"foreignKey:FromWalletID"`
 
-	ToWalletID uuid.UUID `gorm:"type:uuid;not null"`
-	ToWallet   Wallet    `gorm:"foreignKey:ToWalletID"`
+	ToWalletID uuid.NullUUID `gorm:"type:uuid"`
+	ToWallet   Wallet        `gorm:"foreignKey:ToWalletID"`
 }
 
 // Transaction Type
@@ -34,3 +35,16 @@ const (
 	Withdraw TransactionType = "WITHDRAW"
 	Transfer TransactionType = "TRANSFER"
 )
+
+func ParseTransactionType(s string) (TransactionType, error) {
+	switch s {
+	case "DEPOSIT":
+		return Deposit, nil
+	case "WITHDRAW":
+		return Withdraw, nil
+	case "TRANSFER":
+		return Transfer, nil
+	default:
+		return "", fmt.Errorf("invalid transaction type: %s", s)
+	}
+}

@@ -22,7 +22,7 @@ func NewWalletService(
 	return &WalletService{
 		walletRepo: repo,
 		userRepo:   userRepo,
-		mapper:     wallet_dtos.NewWalletMapper(userRepo),
+		mapper:     wallet_dtos.NewWalletMapper(),
 	}
 }
 
@@ -59,19 +59,26 @@ func (s *WalletService) GetWalletService(id string) (wallet_dtos.WalletDetailDTO
 }
 
 func (s *WalletService) CreateWalletService(wallet wallet_dtos.CreateWalletDTO) (*wallet_dtos.WalletDetailDTO, error) {
-	newWallet, err := s.mapper.ToWalletModel(wallet)
+
+	user, err := s.userRepo.FindUser(wallet.UserID)
+	if err != nil {
+		log.Println("Error getting user:", err)
+		return nil, err
+	}
+
+	newWallet, err := s.mapper.ToWalletModel(&wallet, &user)
 	if err != nil {
 		log.Println("Error mapping wallet:", err)
 		return nil, err
 	}
 
-	createdWallet, err := s.walletRepo.CreateWallet(&newWallet)
+	_, err = s.walletRepo.CreateWallet(newWallet)
 	if err != nil {
 		log.Println("Error creating wallet:", err)
 		return nil, err
 	}
 
-	result := s.mapper.ToWalletDetailResponse(*createdWallet, &decimal.Zero)
+	result := s.mapper.ToWalletDetailResponse(*newWallet, &decimal.Zero)
 
 	return &result, nil
 }

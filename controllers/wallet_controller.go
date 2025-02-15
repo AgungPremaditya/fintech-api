@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
-	dtos "ledger-system/dtos/wallet"
+	wallet_dtos "ledger-system/dtos/wallet"
 	"ledger-system/services"
 	"net/http"
 
@@ -57,7 +57,7 @@ func (c *WalletController) GetWallet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *WalletController) CreateWallet(w http.ResponseWriter, r *http.Request) {
-	var dto dtos.CreateWalletDTO
+	var dto wallet_dtos.CreateWalletDTO
 
 	// Mapping request bdata to DTO
 	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {

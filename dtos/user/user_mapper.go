@@ -10,8 +10,8 @@ func NewUserMapper() *Mapper {
 	return &Mapper{}
 }
 
-func (m *Mapper) ToUserEmbedDTO(user models.User) UserEmbedDTO {
-	return UserEmbedDTO{
+func (m *Mapper) ToUserEmbedDTO(user models.User) EmbedUserDTO {
+	return EmbedUserDTO{
 		ID:    user.ID.String(),
 		Name:  user.Name,
 		Email: user.Email,

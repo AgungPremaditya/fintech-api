@@ -26,7 +26,8 @@ func main() {
 		services := services.NewServices(repositories)
 
 		controllers := &routes.Controllers{
-			WalletController: controllers.NewWalletController(services.WalletService),
+			WalletController:      controllers.NewWalletController(services.WalletService),
+			TransactionController: controllers.NewTransactionController(services.TransactionService),
 		}
 
 		// Initialize routes
