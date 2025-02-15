@@ -15,11 +15,11 @@ func SetupRoutes(c *Controllers) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 
 	// Wallet routes
-	walletRouter := router.PathPrefix("/wallets").Subrouter()
+	walletRouter := router.PathPrefix("/api/wallets").Subrouter()
 	WalletRoutes(walletRouter, c.WalletController)
 
 	// Transaction routes
-	transactionRouter := router.PathPrefix("/transactions").Subrouter()
+	transactionRouter := router.PathPrefix("/api/transactions").Subrouter()
 	TransactionRoutes(transactionRouter, c.TransactionController)
 
 	return router
