@@ -48,6 +48,34 @@ func (c *TransactionController) CreateTransaction(w http.ResponseWriter, r *http
 	})
 }
 
+func (c *TransactionController) TransferTransaction(w http.ResponseWriter, r *http.Request) {
+	var dto transaction_dtos.TransferTransactionDTO
+
+	// Mapping request body to DTO
+	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"error": "Invalid request payload",
+		})
+		return
+	}
+	// Create transaction
+	transferTransaction, err := c.transactionService.TransferTransactionService(dto)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"code":          http.StatusInternalServerError,
+			"error_message": err.Error(),
+		})
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"data": transferTransaction,
+	})
+}
+
 func (c *TransactionController) GetTransactions(w http.ResponseWriter, r *http.Request) {
 	// Set Page
 	pageStr := r.URL.Query().Get("page")

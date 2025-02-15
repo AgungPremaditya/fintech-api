@@ -76,3 +76,22 @@ func (m *Mapper) ToTransactionPaginatedResponse(transaction *[]TransactionIndexD
 		Meta:         *meta,
 	}
 }
+
+func (m *Mapper) ToTransferTransaction(transferPayload *TransferTransactionDTO, fromWallet *models.Wallet, toWallet *models.Wallet) *models.Transaction {
+	// Set new transaction
+	newTransaction := models.Transaction{
+		Type:      string(models.Transfer),
+		Amount:    decimal.NewFromFloat(transferPayload.Amount),
+		Reference: transferPayload.Reference,
+	}
+
+	// Set sender
+	newTransaction.FromWalletID.UUID = fromWallet.ID
+	newTransaction.FromWallet = *fromWallet
+
+	// Set receiver
+	newTransaction.ToWalletID.UUID = toWallet.ID
+	newTransaction.ToWallet = *toWallet
+
+	return &newTransaction
+}

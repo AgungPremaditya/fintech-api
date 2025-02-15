@@ -33,5 +33,6 @@ func WalletRoutes(router *mux.Router, c *controllers.WalletController) {
 
 func TransactionRoutes(router *mux.Router, c *controllers.TransactionController) {
 	router.HandleFunc("", c.CreateTransaction).Methods("POST")
+	router.HandleFunc("/transfer", c.TransferTransaction).Methods("POST")
 	router.HandleFunc("", c.GetTransactions).Methods("GET")
 }

@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -35,16 +34,3 @@ const (
 	Withdraw TransactionType = "WITHDRAW"
 	Transfer TransactionType = "TRANSFER"
 )
-
-func ParseTransactionType(s string) (TransactionType, error) {
-	switch s {
-	case "DEPOSIT":
-		return Deposit, nil
-	case "WITHDRAW":
-		return Withdraw, nil
-	case "TRANSFER":
-		return Transfer, nil
-	default:
-		return "", fmt.Errorf("invalid transaction type: %s", s)
-	}
-}

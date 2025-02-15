@@ -85,3 +85,32 @@ func (s *TransactionService) GetTransactionHistory(walletID string, pagination g
 
 	return s.transactionMapper.ToTransactionPaginatedResponse(&data, &meta), nil
 }
+
+func (s *TransactionService) TransferTransactionService(transaction transaction_dtos.TransferTransactionDTO) (*transaction_dtos.DetailTransactionDTO, error) {
+	// Get sender wallet
+	fromWallet, err := s.walletRepo.GetWallet(transaction.FromWalletID)
+	if err != nil {
+		log.Println("Error getting transaction:", err)
+		return nil, err
+	}
+
+	// Get receiver wallet
+	toWallet, err := s.walletRepo.GetWallet(transaction.ToWalletID)
+	if err != nil {
+		log.Println("Error getting transaction:", err)
+		return nil, err
+	}
+
+	// Map DTO to transaction models
+	newTransaction := s.transactionMapper.ToTransferTransaction(&transaction, &fromWallet, &toWallet)
+
+	createdTransaction, err := s.transactionRepo.CreateTransaction(newTransaction)
+	if err != nil {
+		log.Println("Error creating transaction:", err)
+		return nil, err
+	}
+
+	result := s.transactionMapper.ToTransactionDetailResponse(createdTransaction)
+
+	return result, nil
+}
