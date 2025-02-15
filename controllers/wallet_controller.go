@@ -61,14 +61,21 @@ func (c *WalletController) CreateWallet(w http.ResponseWriter, r *http.Request) 
 
 	// Mapping request bdata to DTO
 	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
-		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"error": "Invalid request payload",
+		})
 		return
 	}
 
 	// Create wallet
 	wallet, err := c.walletService.CreateWalletService(dto)
 	if err != nil {
-		http.Error(w, "Failed to create wallet", http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"code":          http.StatusInternalServerError,
+			"error_message": err.Error(),
+		})
 		return
 	}
 

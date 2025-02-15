@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"ledger-system/models"
 
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 )
 
@@ -35,6 +36,32 @@ func (r *WalletRepository) GetWallet(id string) (models.Wallet, error) {
 	}
 
 	return wallet, nil
+}
+
+func (r *WalletRepository) GetWalletBalance(id string) (decimal.Decimal, error) {
+	var sentTransactions []models.Transaction
+	var receivedTransactions []models.Transaction
+
+	// Fetch sent transactions
+	if err := r.db.Where("from_wallet_id = ?", id).Find(&sentTransactions).Error; err != nil {
+		return decimal.Zero, err
+	}
+
+	// Fetch received transactions
+	if err := r.db.Where("to_wallet_id = ?", id).Find(&receivedTransactions).Error; err != nil {
+		return decimal.Zero, err
+	}
+
+	// Count Balance
+	var balance decimal.Decimal
+	for _, tx := range sentTransactions {
+		balance = balance.Sub(tx.Amount)
+	}
+	for _, tx := range receivedTransactions {
+		balance = balance.Add(tx.Amount)
+	}
+
+	return balance, nil
 }
 
 func (r *WalletRepository) CreateWallet(wallet *models.Wallet) (*models.Wallet, error) {
