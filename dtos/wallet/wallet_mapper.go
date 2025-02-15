@@ -4,6 +4,7 @@ import (
 	user_dtos "ledger-system/dtos/user"
 	"ledger-system/models"
 
+	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 )
 
@@ -58,8 +59,12 @@ func (m *Mapper) ToWalletDetailResponse(wallet models.Wallet, balance *decimal.D
 	}
 }
 
-func (m *Mapper) ToWalletEmbedDTO(wallet models.Wallet) EmbedWalletDTO {
-	return EmbedWalletDTO{
+func (m *Mapper) ToWalletEmbedDTO(wallet *models.Wallet) *EmbedWalletDTO {
+	if wallet.ID == uuid.Nil || wallet == nil {
+		return nil
+	}
+
+	return &EmbedWalletDTO{
 		ID:      wallet.ID.String(),
 		Name:    wallet.Name,
 		Address: wallet.Address,

@@ -1,9 +1,12 @@
 package services
 
 import (
+	general_dtos "ledger-system/dtos/general"
 	transaction_dtos "ledger-system/dtos/transaction"
+	"ledger-system/models"
 	"ledger-system/repositories"
 	"log"
+	"math"
 )
 
 type TransactionService struct {
@@ -38,8 +41,6 @@ func (s *TransactionService) CreateTransactionService(transaction transaction_dt
 		return nil, err
 	}
 
-	log.Println("New transaction:", newTransaction)
-
 	createdTransaction, err := s.transactionRepo.CreateTransaction(newTransaction)
 	if err != nil {
 		log.Println("Error creating transaction:", err)
@@ -49,4 +50,38 @@ func (s *TransactionService) CreateTransactionService(transaction transaction_dt
 	result := s.transactionMapper.ToTransactionDetailResponse(createdTransaction)
 
 	return result, nil
+}
+
+func (s *TransactionService) GetTransactionHistory(walletID string, pagination general_dtos.PaginationRequest) (*transaction_dtos.TransactionPaginatedDTO, error) {
+	var transactions []models.Transaction
+
+	// Get transactions
+	transactions, err := s.transactionRepo.GetTransactionsByWalletId(walletID, pagination)
+	if err != nil {
+		log.Println("Error getting transactions:", err)
+		return nil, err
+	}
+
+	if len(transactions) == 0 {
+		return &transaction_dtos.TransactionPaginatedDTO{}, nil
+	}
+
+	// Set Data
+	data := s.transactionMapper.ToTransactionListResponse(transactions)
+
+	// Set Meta
+	totalCount, err := s.transactionRepo.GetTransaction(walletID)
+	if err != nil {
+		log.Println("Error getting total count:", err)
+		return nil, err
+	}
+
+	meta := general_dtos.PaginationMeta{
+		Total:    *totalCount,
+		PerPage:  pagination.PerPage,
+		Page:     pagination.Page,
+		LastPage: int(math.Ceil(float64(*totalCount) / float64(pagination.PerPage))),
+	}
+
+	return s.transactionMapper.ToTransactionPaginatedResponse(&data, &meta), nil
 }

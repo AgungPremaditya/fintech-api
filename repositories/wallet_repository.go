@@ -3,7 +3,6 @@ package repositories
 import (
 	"fmt"
 	"ledger-system/models"
-	"log"
 
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
@@ -29,7 +28,6 @@ func (r *WalletRepository) GetWallets() ([]models.Wallet, error) {
 }
 
 func (r *WalletRepository) GetWallet(id string) (models.Wallet, error) {
-	log.Println("CONNECTION DB >>>>", r)
 	var wallet models.Wallet
 	result := r.db.Preload("User").First(&wallet, "id = ?", id)
 

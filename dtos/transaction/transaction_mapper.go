@@ -1,6 +1,7 @@
 package transaction_dtos
 
 import (
+	general_dtos "ledger-system/dtos/general"
 	wallet_dtos "ledger-system/dtos/wallet"
 	"ledger-system/models"
 
@@ -45,7 +46,33 @@ func (m *Mapper) ToTransactionDetailResponse(transaction *models.Transaction) *D
 		Type:       models.TransactionType(transaction.Type),
 		Amount:     transaction.Amount,
 		Reference:  transaction.Reference,
-		FromWallet: m.walletMapper.ToWalletEmbedDTO(transaction.FromWallet),
-		ToWallet:   m.walletMapper.ToWalletEmbedDTO(transaction.ToWallet),
+		FromWallet: *m.walletMapper.ToWalletEmbedDTO(&transaction.FromWallet),
+		ToWallet:   *m.walletMapper.ToWalletEmbedDTO(&transaction.ToWallet),
+	}
+}
+
+func (m *Mapper) ToTransactionResponse(transaction *models.Transaction) TransactionIndexDTO {
+	return TransactionIndexDTO{
+		ID:         transaction.ID.String(),
+		Type:       transaction.Type,
+		FromWallet: m.walletMapper.ToWalletEmbedDTO(&transaction.FromWallet),
+		ToWallet:   m.walletMapper.ToWalletEmbedDTO(&transaction.ToWallet),
+		Amount:     transaction.Amount.String(),
+		Reference:  transaction.Reference,
+	}
+}
+
+func (m *Mapper) ToTransactionListResponse(transactions []models.Transaction) []TransactionIndexDTO {
+	result := make([]TransactionIndexDTO, len(transactions))
+	for i, transaction := range transactions {
+		result[i] = m.ToTransactionResponse(&transaction)
+	}
+	return result
+}
+
+func (m *Mapper) ToTransactionPaginatedResponse(transaction *[]TransactionIndexDTO, meta *general_dtos.PaginationMeta) *TransactionPaginatedDTO {
+	return &TransactionPaginatedDTO{
+		Transactions: *transaction,
+		Meta:         *meta,
 	}
 }
