@@ -39,27 +39,26 @@ func (r *WalletRepository) GetWallet(id string) (models.Wallet, error) {
 }
 
 func (r *WalletRepository) GetWalletBalance(id string) (decimal.Decimal, error) {
-	var sentTransactions []models.Transaction
-	var receivedTransactions []models.Transaction
+	var sentTotal, receivedTotal decimal.Decimal
 
-	// Fetch sent transactions
-	if err := r.db.Where("from_wallet_id = ?", id).Find(&sentTransactions).Error; err != nil {
+	// Sum sent amount
+	if err := r.db.Model(&models.Transaction{}).
+		Where("from_wallet_id = ?", id).
+		Select("COALESCE(SUM(amount), 0)").
+		Scan(&sentTotal).Error; err != nil {
 		return decimal.Zero, err
 	}
 
-	// Fetch received transactions
-	if err := r.db.Where("to_wallet_id = ?", id).Find(&receivedTransactions).Error; err != nil {
+	// Sum received amount
+	if err := r.db.Model(&models.Transaction{}).
+		Where("to_wallet_id = ?", id).
+		Select("COALESCE(SUM(amount), 0)").
+		Scan(&receivedTotal).Error; err != nil {
 		return decimal.Zero, err
 	}
 
-	// Count Balance
-	var balance decimal.Decimal
-	for _, tx := range sentTransactions {
-		balance = balance.Sub(tx.Amount)
-	}
-	for _, tx := range receivedTransactions {
-		balance = balance.Add(tx.Amount)
-	}
+	// Calculate balance
+	balance := receivedTotal.Sub(sentTotal)
 
 	return balance, nil
 }

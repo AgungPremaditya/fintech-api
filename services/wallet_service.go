@@ -53,7 +53,7 @@ func (s *WalletService) GetWalletService(id string) (wallet_dtos.WalletDetailDTO
 		return wallet_dtos.WalletDetailDTO{}, err
 	}
 
-	result := s.mapper.ToWalletDetailResponse(wallet, balance)
+	result := s.mapper.ToWalletDetailResponse(wallet, &balance)
 
 	return result, nil
 }
@@ -71,7 +71,7 @@ func (s *WalletService) CreateWalletService(wallet wallet_dtos.CreateWalletDTO) 
 		return nil, err
 	}
 
-	result := s.mapper.ToWalletDetailResponse(*createdWallet, decimal.Zero)
+	result := s.mapper.ToWalletDetailResponse(*createdWallet, &decimal.Zero)
 
 	return &result, nil
 }

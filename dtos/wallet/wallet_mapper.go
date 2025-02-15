@@ -55,8 +55,7 @@ func (m *Mapper) ToWalletModel(dto CreateWalletDTO) (models.Wallet, error) {
 	}, nil
 }
 
-func (m *Mapper) ToWalletDetailResponse(wallet models.Wallet, balance decimal.Decimal) WalletDetailDTO {
-
+func (m *Mapper) ToWalletDetailResponse(wallet models.Wallet, balance *decimal.Decimal) WalletDetailDTO {
 	// Map user data
 	userEmbed := m.userMapper.ToUserEmbedDTO(wallet.User)
 
@@ -65,7 +64,7 @@ func (m *Mapper) ToWalletDetailResponse(wallet models.Wallet, balance decimal.De
 		Name:      wallet.Name,
 		Address:   wallet.Address,
 		User:      userEmbed,
-		Balance:   balance,
+		Balance:   *balance,
 		CreatedAt: wallet.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt: wallet.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}
