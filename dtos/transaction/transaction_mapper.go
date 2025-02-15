@@ -46,8 +46,8 @@ func (m *Mapper) ToTransactionDetailResponse(transaction *models.Transaction) *D
 		Type:       models.TransactionType(transaction.Type),
 		Amount:     transaction.Amount,
 		Reference:  transaction.Reference,
-		FromWallet: *m.walletMapper.ToWalletEmbedDTO(&transaction.FromWallet),
-		ToWallet:   *m.walletMapper.ToWalletEmbedDTO(&transaction.ToWallet),
+		FromWallet: m.walletMapper.ToWalletEmbedDTO(&transaction.FromWallet),
+		ToWallet:   m.walletMapper.ToWalletEmbedDTO(&transaction.ToWallet),
 	}
 }
 
